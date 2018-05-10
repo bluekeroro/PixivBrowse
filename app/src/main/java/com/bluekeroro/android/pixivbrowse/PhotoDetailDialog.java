@@ -48,7 +48,9 @@ public class PhotoDetailDialog extends DialogFragment {
         mTagTextView=(TextView)v.findViewById(R.id.TagTextView);
         mWaitTextView=(TextView)v.findViewById(R.id.WaitTextView);
         mTagTextView.setText("TAG: "+mGalleryItem.getTags()+"\n"+mGalleryItem.getPhotoUrl());
-        mTagTextView.setMovementMethod(LinkMovementMethod.getInstance());//If no add this code, need to click twice.
+        //If no add this code, need to click twice,but added would cause two same webs show.
+        //mTagTextView.setMovementMethod(LinkMovementMethod.getInstance());
+
         LocalCache=new FileUtils(getActivity());
         mHandler=new Handler();
         mThread=new Thread(new Runnable() {
