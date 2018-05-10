@@ -31,7 +31,7 @@ public abstract class TabActivity extends AppCompatActivity {
 
     private void initView() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        viewPager.setOffscreenPageLimit(2);//保持加载未显示的两个页卡
+        viewPager.setOffscreenPageLimit(3);//保持加载未显示的两个页卡
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
         pagerAdapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager(), this);

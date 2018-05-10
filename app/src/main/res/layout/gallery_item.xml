@@ -4,14 +4,16 @@
              android:layout_height="wrap_content"
              android:layout_marginLeft="5dp"
              android:layout_marginTop="5dp">
-    <ImageView
-        android:id="@+id/fragment_photo_gallery_image_view"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        >
-    </ImageView>
+        <ImageView
+            android:id="@+id/fragment_photo_gallery_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"/>
+        <!--android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"-->
     <TextView
         android:id="@+id/fragment_photo_gallery_rank"
         android:textColor="#776e65"

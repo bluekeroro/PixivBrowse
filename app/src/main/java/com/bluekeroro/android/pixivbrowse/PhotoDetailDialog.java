@@ -1,8 +1,10 @@
 package com.bluekeroro.android.pixivbrowse;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.os.Build;
 import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -11,6 +13,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +48,7 @@ public class PhotoDetailDialog extends DialogFragment {
         mTagTextView=(TextView)v.findViewById(R.id.TagTextView);
         mWaitTextView=(TextView)v.findViewById(R.id.WaitTextView);
         mTagTextView.setText("TAG: "+mGalleryItem.getTags()+"\n"+mGalleryItem.getPhotoUrl());
+        mTagTextView.setMovementMethod(LinkMovementMethod.getInstance());//If no add this code, need to click twice.
         LocalCache=new FileUtils(getActivity());
         mHandler=new Handler();
         mThread=new Thread(new Runnable() {

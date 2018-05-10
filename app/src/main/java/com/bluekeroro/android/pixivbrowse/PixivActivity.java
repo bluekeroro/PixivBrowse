@@ -14,19 +14,27 @@ import java.util.List;
 public class PixivActivity extends TabActivity{
     @Override
     protected List<Fragment> getFragments() {
-        List fragments = new ArrayList();
+        List<Fragment> fragments = new ArrayList<>();
         fragments.add(PixivFragment.newInstance("daily"));
         fragments.add(PixivFragment.newInstance("weekly"));
         fragments.add(PixivFragment.newInstance("monthly"));
+        fragments.add(PixivFragment.newInstance("rookie"));
+        /*fragments.add(PixivFragment.newInstance("original"));
+        fragments.add(PixivFragment.newInstance("male"));
+        fragments.add(PixivFragment.newInstance("female"));*/
         return fragments;
     }
 
     @Override
     protected List<String> getTitles() {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<>();
         list.add("Daily");
         list.add("Weekly");
         list.add("Monthly");
+        list.add("Rookie");
+        /*list.add("Original");
+        list.add("Male");
+        list.add("Female");*/
         //could add more...
         return list;
     }
@@ -34,7 +42,10 @@ public class PixivActivity extends TabActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+            finish();
+            return;
+        }
     }
 
 

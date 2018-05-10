@@ -1,5 +1,6 @@
 package com.bluekeroro.android.pixivbrowse;
 
+import android.graphics.BitmapFactory;
 import android.support.v4.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,9 +12,11 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,6 +46,7 @@ public class PixivFragment extends Fragment {
     private TextView mTextView;
     private String mode;
     private List<GalleryItem> mItems=new ArrayList<>();
+    private GetItemsTask mGetItemsTask;
     public static PixivFragment newInstance(String mode){
         Bundle args = new Bundle();
         args.putString(GETMODE, mode);
@@ -139,24 +145,29 @@ public class PixivFragment extends Fragment {
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),mPhotoRecyclerView.getWidth()/300));
-                Log.i("tets111",""+position+"/"+mode);
+                /**  错列排序
+                 * StaggeredGridLayoutManager layoutManager=new StaggeredGridLayoutManager
+                 *                 (mPhotoRecyclerView.getWidth()/300, StaggeredGridLayoutManager.VERTICAL);
+                 */
+                GridLayoutManager layoutManager=new GridLayoutManager(getActivity(),mPhotoRecyclerView.getWidth()/300);
+                mPhotoRecyclerView.setLayoutManager(layoutManager);
                 mPhotoRecyclerView.scrollToPosition(position);
                 updateItem();
                 mPhotoRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
         setupAdapter();
-        mPhotoRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        mPhotoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                GridLayoutManager layoutManager=(GridLayoutManager)mPhotoRecyclerView.getLayoutManager();
+                position=layoutManager.findFirstVisibleItemPosition();
             }
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if(!recyclerView.canScrollVertically(1)){
                     Log.i("onScrollStateChanged","onScrollStateChanged"+"bottom");
-
                     //updateItem();
                 }
             }
@@ -206,6 +217,14 @@ public class PixivFragment extends Fragment {
             });
         }
         public void bindGalleryDrawable(Drawable drawable){
+            /** 错列排序
+            ViewGroup.LayoutParams lp=mItemImageView.getLayoutParams();
+            if(mItemImageView.getWidth()!=0){
+                int width=mItemImageView.getWidth();
+                lp.width=width;
+                lp.height=width*Integer.parseInt(mGalleryItem.getHeight())/Integer.parseInt(mGalleryItem.getWidth());
+                mItemImageView.setLayoutParams(lp);
+            }*/
             mItemImageView.setImageDrawable(drawable);
         }
         public void bindGalleryItem(GalleryItem galleryItem){
@@ -232,6 +251,9 @@ public class PixivFragment extends Fragment {
             holder.bindGalleryItem(galleryItem);
             if(mRequestMap.get(holder)!=galleryItem.getUrl()){
                 Drawable placeholder=getResources().getDrawable(R.drawable.bill_up_close);
+                /*if (placeholder != null) {
+                    placeholder.setBounds(0,0,Integer.parseInt(galleryItem.getWidth()),Integer.parseInt(galleryItem.getHeight()));
+                }*/
                 holder.bindGalleryDrawable(placeholder);
                 Log.i("test","绑定默认视图加载图片"+holder.toString());
             }
@@ -278,7 +300,8 @@ public class PixivFragment extends Fragment {
         }
         //String query=QueryPreferences.getStoredQuery(getActivity());
         if(mItems.size()==0){
-            new GetItemsTask(mode).execute();
+            mGetItemsTask=new GetItemsTask(mode);
+            mGetItemsTask.execute();
         }else{
             mPhotoRecyclerView.getAdapter().notifyDataSetChanged();
         }
@@ -303,4 +326,11 @@ public class PixivFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mGetItemsTask != null && mGetItemsTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mGetItemsTask.cancel(true); // 如果Task还在运行，则先取消它
+        }
+    }
 }
