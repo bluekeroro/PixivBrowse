@@ -66,17 +66,13 @@ public class PhotoDetailDialog extends DialogFragment {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                        if(!isAdded()){
+                            return ;
+                        }
                         Drawable drawable=new BitmapDrawable(getResources(),bitmap);
-                        mPhotoImageView.getWidth();
-                        //drawable.setBounds(0,0,mPhotoImageView.getWidth(),0);
                         mPhotoImageView.setAdjustViewBounds(true);
                         mPhotoImageView.setImageDrawable(drawable);
                         mWaitTextView.setVisibility(View.GONE);
-                        if(bitmap.getWidth()>mPhotoImageView.getWidth()){
-                            Log.i("test","bitmap.getWidth()>mPhotoImageView.getWidth()"+true);
-                        }else{
-                            Log.i("test","bitmap.getWidth()>mPhotoImageView.getWidth()"+false);
-                        }
                     }
                 });
             }

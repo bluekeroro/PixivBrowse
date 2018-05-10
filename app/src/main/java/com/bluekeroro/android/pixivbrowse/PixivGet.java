@@ -31,7 +31,7 @@ public class PixivGet {
             .buildUpon()
             .appendQueryParameter("type",GET_TYPE)
             .appendQueryParameter("content","illust")
-            .appendQueryParameter("per_page","500")
+            .appendQueryParameter("per_page","3000")
             .appendQueryParameter("page","1")
             .appendQueryParameter("date",sDateFormat.format(new Date(mNowDate.getTime()-(long)2*24*60*60*1000)))
             .build();

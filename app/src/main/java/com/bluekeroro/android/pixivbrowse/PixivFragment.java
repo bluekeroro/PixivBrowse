@@ -36,11 +36,17 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class PixivFragment extends Fragment {
     private static final String DIALOG_PHOTO="DialogPhoto";
+    private static final String GETMODE="GetMode";
     private RecyclerView mPhotoRecyclerView;
     private TextView mTextView;
+    private String mode;
     private List<GalleryItem> mItems=new ArrayList<>();
-    public static PixivFragment newInstance(){
-        return new PixivFragment();
+    public static PixivFragment newInstance(String mode){
+        Bundle args = new Bundle();
+        args.putString(GETMODE, mode);
+        PixivFragment fragment = new PixivFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
     private static final String TAG="PhotoGalleryFragment";
     private ThumbnailDownLoader<PhotoHolder> mThumbnailDownLoader;
@@ -55,7 +61,9 @@ public class PixivFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         setRetainInstance(true);
+        mode=getArguments().getString(GETMODE,null);
         //================================================
         long maxMemory=Runtime.getRuntime().maxMemory();
         mLruCache=new LruCache<String,Bitmap>((int)(maxMemory/8)){
@@ -106,7 +114,6 @@ public class PixivFragment extends Fragment {
         mThumbnailDownLoader2.start();
         mThumbnailDownLoader2.getLooper();
         //===========================================
-
         position=0;
         if(savedInstanceState!=null){
             position=savedInstanceState.getInt(ITEMPOSITION);
@@ -133,9 +140,10 @@ public class PixivFragment extends Fragment {
             @Override
             public void onGlobalLayout() {
                 mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),mPhotoRecyclerView.getWidth()/300));
+                Log.i("tets111",""+position+"/"+mode);
                 mPhotoRecyclerView.scrollToPosition(position);
-                mPhotoRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 updateItem();
+                mPhotoRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
         setupAdapter();
@@ -144,11 +152,11 @@ public class PixivFragment extends Fragment {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
             }
-
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if(!recyclerView.canScrollVertically(1)){
                     Log.i("onScrollStateChanged","onScrollStateChanged"+"bottom");
+
                     //updateItem();
                 }
             }
@@ -170,11 +178,9 @@ public class PixivFragment extends Fragment {
         }
         @Override
         protected void onPostExecute(List<GalleryItem> galleryItems) {
-            if(mTextView!=null){
-                mTextView.setVisibility(View.INVISIBLE);
-            }
             mItems=galleryItems;
             setupAdapter();
+            updateItem();
         }
     }
     private class PhotoHolder extends RecyclerView.ViewHolder{
@@ -265,10 +271,36 @@ public class PixivFragment extends Fragment {
 
 
     private void updateItem(){
-        if(mTextView!=null){
+        if(mTextView!=null&&mItems.size()==0){
             mTextView.setVisibility(View.VISIBLE);
+        }else{
+            mTextView.setVisibility(View.INVISIBLE);
         }
         //String query=QueryPreferences.getStoredQuery(getActivity());
-        new GetItemsTask(null).execute();
+        if(mItems.size()==0){
+            new GetItemsTask(mode).execute();
+        }else{
+            mPhotoRecyclerView.getAdapter().notifyDataSetChanged();
+        }
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_photo_gallery,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.menu_item_refresh:
+                mItems.clear();
+                mPhotoRecyclerView.getAdapter().notifyDataSetChanged();
+                updateItem();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 }
