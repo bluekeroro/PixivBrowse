@@ -22,5 +22,10 @@
 * Use HandlerThread to load image.
 * Use LruCache and local cache to cache image.
 
+# ScreenShot:
+![image](https://user-images.githubusercontent.com/25412051/39878177-4a061250-54aa-11e8-94eb-5e7b7dd2feda.png)
+![image](https://user-images.githubusercontent.com/25412051/39878212-5d84e838-54aa-11e8-9f31-122a6ce92dbe.png)
+
+
 # Todo List:
 * Add search function.
