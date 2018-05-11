@@ -5,9 +5,13 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 
+import java.io.OptionalDataException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,9 +50,35 @@ public class PixivActivity extends TabActivity{
             finish();
             return;
         }
+
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main,menu);
+        MenuItem searchItem=menu.findItem(R.id.menu_item_search);
+        final SearchView searchView=(SearchView)searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                searchView.onActionViewCollapsed();
+                Intent i=SearchActivity.newIntent(PixivActivity.this,s);
+                startActivity(i);
+                return true;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 }
 /*public class PixivActivity extends SingleFragmentActivity {
     public static Intent newIntent(Context context){

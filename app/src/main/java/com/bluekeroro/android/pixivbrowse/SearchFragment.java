@@ -35,23 +35,22 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 /**
- * Created by BlueKeroro on 2018/4/5.
+ * Created by BlueKeroro on 2018/5/11.
  */
-public class PixivFragment extends Fragment {
+public class SearchFragment extends Fragment {
     private static final String DIALOG_PHOTO="DialogPhoto";
-    private static final String GETMODE="GetMode";
+    private static final String GETSEARCHWORD="getSearchWord";
     private RecyclerView mPhotoRecyclerView;
     private TextView mTextView;
-    private String mode;
     private TextView mNoResourceTextView;
+    private String searchWord;
     private List<GalleryItem> mItems=new ArrayList<>();
     private GetItemsTask mGetItemsTask;
-    public static PixivFragment newInstance(String mode){
+    public static SearchFragment newInstance(String searchWord){
         Bundle args = new Bundle();
-        args.putString(GETMODE, mode);
-        PixivFragment fragment = new PixivFragment();
+        args.putString(GETSEARCHWORD, searchWord);
+        SearchFragment fragment = new SearchFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,7 +69,7 @@ public class PixivFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         setRetainInstance(true);
-        mode=getArguments().getString(GETMODE,null);
+        searchWord=getArguments().getString(GETSEARCHWORD,null);
         //================================================
         long maxMemory=Runtime.getRuntime().maxMemory();
         mLruCache=new LruCache<String,Bitmap>((int)(maxMemory/8)){
@@ -148,10 +147,6 @@ public class PixivFragment extends Fragment {
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                /**  错列排序
-                 * StaggeredGridLayoutManager layoutManager=new StaggeredGridLayoutManager
-                 *                 (mPhotoRecyclerView.getWidth()/300, StaggeredGridLayoutManager.VERTICAL);
-                 */
                 GridLayoutManager layoutManager=new GridLayoutManager(getActivity(),mPhotoRecyclerView.getWidth()/300);
                 mPhotoRecyclerView.setLayoutManager(layoutManager);
                 mPhotoRecyclerView.scrollToPosition(position);
@@ -178,16 +173,16 @@ public class PixivFragment extends Fragment {
         return v;
     }
     private class GetItemsTask extends AsyncTask<Void,Void,List<GalleryItem>>{
-        private String mode;
-        public GetItemsTask(String mode){
-            this.mode=mode;
+        private String word;
+        public GetItemsTask(String word){
+            this.word=word;
         }
         @Override
         protected List<GalleryItem> doInBackground(Void... params) {
-            if(mode==null){
+            if(word==null){
                 return new PixivGet().getPhotos("monthly");
             }else{
-                return new PixivGet().getPhotos(mode);
+                return new PixivGet().getSearchPhotos(word);
             }
         }
         @Override
@@ -227,14 +222,6 @@ public class PixivFragment extends Fragment {
             });
         }
         public void bindGalleryDrawable(Drawable drawable){
-            /** 错列排序
-            ViewGroup.LayoutParams lp=mItemImageView.getLayoutParams();
-            if(mItemImageView.getWidth()!=0){
-                int width=mItemImageView.getWidth();
-                lp.width=width;
-                lp.height=width*Integer.parseInt(mGalleryItem.getHeight())/Integer.parseInt(mGalleryItem.getWidth());
-                mItemImageView.setLayoutParams(lp);
-            }*/
             mItemImageView.setImageDrawable(drawable);
         }
         public void bindGalleryItem(GalleryItem galleryItem){
@@ -312,7 +299,7 @@ public class PixivFragment extends Fragment {
         }
         //String query=QueryPreferences.getStoredQuery(getActivity());
         if(mItems.size()==0){
-            mGetItemsTask=new GetItemsTask(mode);
+            mGetItemsTask=new GetItemsTask(searchWord);
             mGetItemsTask.execute();
         }else{
             mPhotoRecyclerView.getAdapter().notifyDataSetChanged();
@@ -322,7 +309,27 @@ public class PixivFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_photo_gallery,menu);
+        inflater.inflate(R.menu.search_fragment,menu);
+        MenuItem searchItem=menu.findItem(R.id.menu_item_search);
+        final SearchView searchView=(SearchView)searchItem.getActionView();
+        searchView.setQuery(searchWord,false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                searchView.onActionViewCollapsed();
+                //search
+                mItems.clear();
+                mPhotoRecyclerView.getAdapter().notifyDataSetChanged();
+                searchWord=s;
+                updateItem();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
     }
 
     @Override
@@ -332,6 +339,9 @@ public class PixivFragment extends Fragment {
                 mItems.clear();
                 mPhotoRecyclerView.getAdapter().notifyDataSetChanged();
                 updateItem();
+                return true;
+            case R.id.menu_item_cancel:
+                getActivity().onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

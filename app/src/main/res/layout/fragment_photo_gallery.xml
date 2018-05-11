@@ -14,5 +14,13 @@
         android:gravity="center"
         android:textSize="30dp"
         android:text="@string/loading_text"/>
+    <TextView
+        android:id="@+id/fragment_photo_no_resource"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:textSize="30dp"
+        android:text="@string/no_resource"/>
 </RelativeLayout>
 
