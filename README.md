@@ -23,9 +23,6 @@
 * Use LruCache and local cache to cache image.
 
 # ScreenShot:
-![image](https://user-images.githubusercontent.com/25412051/39878177-4a061250-54aa-11e8-94eb-5e7b7dd2feda.png)
-![image](https://user-images.githubusercontent.com/25412051/39878212-5d84e838-54aa-11e8-9f31-122a6ce92dbe.png)
-
-
-# Todo List:
-* Add search function.
+![image](https://user-images.githubusercontent.com/25412051/39910473-19425ef0-552a-11e8-8db9-f1600afdb325.png)
+![image](https://user-images.githubusercontent.com/25412051/39910497-336579d4-552a-11e8-8e8f-d9710877d13a.png)
+![image](https://user-images.githubusercontent.com/25412051/39910557-69f21c64-552a-11e8-86fc-038c3e725d64.png)
