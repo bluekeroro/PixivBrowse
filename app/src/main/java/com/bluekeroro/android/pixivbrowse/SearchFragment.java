@@ -30,6 +30,8 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.leakcanary.RefWatcher;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -280,6 +282,8 @@ public class SearchFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         mThumbnailDownLoader.quit();
+        mThumbnailDownLoader1.quit();
+        mThumbnailDownLoader2.quit();
         Log.i(TAG,"Background thread destroyed");
     }
     @Override

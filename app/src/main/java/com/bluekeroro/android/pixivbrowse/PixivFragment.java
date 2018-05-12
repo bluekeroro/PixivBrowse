@@ -293,6 +293,8 @@ public class PixivFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         mThumbnailDownLoader.quit();
+        mThumbnailDownLoader1.quit();
+        mThumbnailDownLoader2.quit();
         Log.i(TAG,"Background thread destroyed");
     }
     @Override

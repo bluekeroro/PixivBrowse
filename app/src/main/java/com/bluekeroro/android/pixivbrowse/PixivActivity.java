@@ -42,7 +42,6 @@ public class PixivActivity extends TabActivity{
         //could add more...
         return list;
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,9 +49,7 @@ public class PixivActivity extends TabActivity{
             finish();
             return;
         }
-
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main,menu);
